@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Te Amo Matrix con Explosiones</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      background: black;
+      overflow: hidden;
+      font-family: 'Press Start 2P', cursive;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: block;
+      z-index: 0;
+    }
+
+    .center-text {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #F5A3C8;
+      font-size: 4.5vw;
+      text-align: center;
+      z-index: 10;
+      user-select: none;
+      text-shadow: 2px 2px #000;
+    }
+
+    @media (max-width: 600px) {
+      .center-text {
+        font-size: 7vw;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+<div class="center-text">TE AMO MUCHO BRITHANY💗🥺</div>
+
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  let width, height;
+  const fontSize = 22;
+  const heart = '💗';
+  let columns, drops;
+
+  const particles = [];
+
+  function resizeCanvas() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+    columns = Math.floor(width / fontSize);
+    drops = Array(columns).fill(1);
+  }
+
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  // Explosión de corazones al hacer clic
+  canvas.addEventListener('click', function(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
+    const count = 30;
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 3 + 1;
+      particles.push({
+        x: clickX,
+        y: clickY,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        alpha: 1
+      });
+    }
+  });
+
+  function draw() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.fillStyle = '#ff4d6d';
+    ctx.font = fontSize + 'px monospace';
+    for (let i = 0; i < drops.length; i++) {
+      ctx.fillText(heart, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+
+    // Partículas
+    particles.forEach((p, idx) => {
+      ctx.globalAlpha = p.alpha;
+      ctx.fillText(heart, p.x, p.y);
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.05;
+      p.alpha -= 0.02;
+      if (p.alpha <= 0) particles.splice(idx, 1);
+    });
+    ctx.globalAlpha = 1;
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+</script>
+
+</body>
+</html>
